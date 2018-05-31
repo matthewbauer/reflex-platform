@@ -760,6 +760,7 @@ in let this = rec {
         "${nixpkgs.path}/nixos/modules/profiles/demo.nix"
       ];
       environment.systemPackages = tryReflexPackages;
+      nixpkgs = { inherit system; localSystem = {inherit system;}; };
     };
   }).config.system.build.virtualBoxOVA;
 
