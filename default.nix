@@ -24,6 +24,17 @@ let nixpkgs = nixpkgsFunc ({
         };
       } // config;
     });
+    appleLibiconvHack = self: super: {
+      darwin = super.darwin // {
+        libiconv =
+          if self.hostPlatform == self.buildPlatform
+          then super.darwin.libiconv
+          else super.darwin.libiconv.overrideAttrs (o: {
+            postInstall = "rm $out/include/libcharset.h $out/include/localcharset.h";
+            configureFlags = ["--disable-shared" "--enable-static"];
+        });
+      };
+    };
     inherit (nixpkgs) fetchurl fetchgit fetchFromGitHub;
     nixpkgsCross = {
       android = nixpkgs.lib.mapAttrs (_: args: if args == null then null else nixpkgsFunc args) rec {
@@ -117,6 +128,7 @@ let nixpkgs = nixpkgsFunc ({
             openssl.system = "darwin64-x86_64-cc";
             libc = "libSystem";
           };
+          overlays = [appleLibiconvHack];
           inherit config;
         };
         arm64 = if system != "x86_64-darwin" then null else {
@@ -136,6 +148,7 @@ let nixpkgs = nixpkgsFunc ({
             openssl.system = "ios64-cross";
             libc = "libSystem";
           };
+          overlays = [appleLibiconvHack];
           inherit config;
         };
       };
