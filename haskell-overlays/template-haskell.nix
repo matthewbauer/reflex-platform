@@ -1,4 +1,0 @@
-{ haskellLib, fetchFromGitHub }:
-
-self: super: {
-}
